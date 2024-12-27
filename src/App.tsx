@@ -1,46 +1,44 @@
 import { useSelector } from "react-redux";
 import { selectPost, useGetPostsQuery } from "./_features/post/postSlice";
-import "./App.css"; 
-import {
-  selectComments,
-  useGetCommentsQuery,
-} from "./_features/comment/commentSlice";
+import "./App.css";
+import { useGetCommentsQuery, useLoginMutation } from "./_features/comment/commentSlice";
 
 function App() {
   useGetPostsQuery();
-  useGetCommentsQuery();
+  const { data: comments, error, isLoading } = useGetCommentsQuery();
+  const [login, { isLoading: loginLoading }] = useLoginMutation(); 
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error fetching posts</p>;
 
   return (
-    <ul>
+    <div>
+      <button onClick={() => login()}>login {loginLoading ? 'loading' : 'done loading'}</button>
+      post
+      <ul>
+        {comments?.map((comment: any) => (
+          <li key={comment.id}>{comment.body}</li>
+        ))}
+      </ul>
       <PostsList />
-    </ul>
+    </div>
   );
 }
 
 export default App;
 
-
 // anggap saja di page lain
 const PostsList: React.FC = () => {
-  const comments = useSelector(selectComments);
-  const posts = useSelector(selectPost); 
+  const posts = useSelector(selectPost);
 
-
-  if (!posts || !comments) return;
-  
+  if (!posts) return;
 
   return (
     <div>
-      post
-      <ul> 
-        {posts.map((post: any) => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
       comment
       <ul>
-        {comments.map((comment: any) => (
-          <li key={comment.id}>{comment.body}</li>
+        {posts.map((post: any) => (
+          <li key={post.id}>{post.title}</li>
         ))}
       </ul>
     </div>
