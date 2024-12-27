@@ -1,17 +1,25 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
 export const createFetchBaseQuery = ({
-  baseUrl = "https://my-json-server.typicode.com/typicode/demo/", 
+  baseUrl = "https://my-json-server.typicode.com/typicode/demo/",
   additionalConfig = {},
-}: { baseUrl?: string; additionalConfig?: Record<string, any> }) => {
+}: {
+  baseUrl?: string;
+  additionalConfig?: Record<string, any>;
+}) => {
   return fetchBaseQuery({
     baseUrl,
     prepareHeaders: (headers) => {
-      Object.entries(headers).forEach(([key, value]) => {
-        headers.set(key, value);
-      });
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
     ...additionalConfig,
   });
+};
+
+export const saveToken = (token: string) => {
+  localStorage.setItem("authToken", token);
 };
